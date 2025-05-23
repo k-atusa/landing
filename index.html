@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KATUSA Programming Club</title>
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/8/8f/Eighth_Army_Logo_with_MSC_Logos.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        body {
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(62, 84, 172, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 82, 82, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            position: relative;
+            z-index: 1;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+        }
+        .avatar-circle {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center pt-20">
+            <h1 id="title" class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate__animated animate__fadeInUp tracking-tight">
+                KATUSA PROGRAMMING CLUB
+            </h1>
+        </div>
+
+        <div class="flex flex-col lg:flex-row justify-center gap-8 lg:gap-10 mt-16 lg:mt-24 items-center">
+            <!-- D-day Counter Box -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow animate__animated animate__fadeInUp">
+                <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">ETS Counter</h2>
+                <div id="dday" class="text-5xl font-bold text-white tracking-tight">
+                    Loading...
+                </div>
+                <div class="mt-8">
+                    <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div id="percent-bar" class="h-3 bg-gradient-to-r from-blue-400 to-blue-600" style="width:0%"></div>
+                    </div>
+                    <div class="mt-2 text-right text-sm text-gray-300 font-medium">
+                        <span id="percent-text">0%</span> completed
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members Box -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow mt-8 lg:mt-0 animate__animated animate__fadeInUp">
+                <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">Club Members</h2>
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-5">
+                        <a href="https://github.com/D3vle0" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
+                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
+                                <img src="https://avatars.githubusercontent.com/u/44903787?v=4" alt="D3vle0 avatar" class="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <p class="font-medium text-lg tracking-tight group-hover:underline">D3vle0</p>
+                                <p class="text-xs text-gray-400 tracking-tight">leo [at] katusa [dot] xyz</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="flex items-center space-x-5">
+                        <a href="https://github.com/taewook427" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
+                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
+                                <img src="https://avatars.githubusercontent.com/u/144579627?v=4" alt="taewook427 avatar" class="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                                <p class="font-medium text-lg tracking-tight group-hover:underline">taewook427</p>
+                                <p class="text-xs text-gray-400 tracking-tight">ko [at] katusa [dot] xyz</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new TypeIt("#title", {
+            speed: 75,
+            waitUntilVisible: true,
+            cursor: false
+        }).go();
+
+        // D-day Counter
+        function updateDday() {
+            const enlistDate = new Date('2025-03-04');
+            const targetDate = new Date('2026-09-03');
+            const today = new Date();
+            const diffTime = targetDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            document.getElementById('dday').textContent = `D-${diffDays}`;
+
+            // Percent calculation
+            const total = targetDate - enlistDate;
+            const done = today - enlistDate;
+            let percent = Math.max(0, Math.min(1, done / total));
+            percent = isNaN(percent) ? 0 : percent;
+            const percentNum = (percent * 100).toFixed(7);
+            document.getElementById('percent-bar').style.width = percentNum + '%';
+            document.getElementById('percent-text').textContent = percentNum + '%';
+        }
+
+        updateDday();
+        setInterval(updateDday, 50); // Update every 50ms for real-time percentage
+    </script>
+</body>
+</html>
