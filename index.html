@@ -58,28 +58,24 @@
         .hover-glow:hover {
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
         }
-        .container {
-            position: relative;
-            z-index: 1;
+        /* Common card wrapper styles extracted for cleaner HTML */
+        .card-wrapper {
+            @apply glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow animate__animated animate__fadeInUp;
         }
     </style>
 </head>
 <body class="min-h-screen text-white">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-4 z-10 relative">
         <div class="text-center pt-20">
-            <h1 id="title" class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate__animated animate__fadeInUp tracking-tight">
-                KATUSA PROGRAMMING CLUB
-            </h1>
-            <div class="mt-2 text-lg text-gray-400 font-semibold animate__animated animate__fadeInUp animate__delay-0_5s">Cycle 06-25</div>
+            <h1 id="title" class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate__animated animate__fadeInUp tracking-tight"> KATUSA PROGRAMMING CLUB </h1>
+            <div class="mt-2 text-lg text-gray-400 font-semibold animate__animated animate__fadeInUp animate__delay-0_5s"> Cycle 06-25 </div>
         </div>
 
         <div class="flex flex-col xl:flex-row flex-wrap justify-center gap-8 lg:gap-10 mt-16 lg:mt-24 items-center">
-            <!-- D-day Counter Box -->
+            <!-- ETS Counter Card -->
             <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow animate__animated animate__fadeInUp">
                 <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">ETS Counter</h2>
-                <div id="dday" class="text-5xl font-bold text-white tracking-tight">
-                    Loading...
-                </div>
+                <div id="dday" class="text-5xl font-bold text-white tracking-tight">Loading...</div>
                 <div class="mt-8">
                     <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
                         <div id="percent-bar" class="h-3 bg-gradient-to-r from-blue-400 to-blue-600" style="width:0%"></div>
@@ -89,98 +85,17 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Members Box -->
+            <!-- Club Members Card -->
             <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow mt-8 lg:mt-0 animate__animated animate__fadeInUp">
                 <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">Club Members</h2>
-                <div class="space-y-6">
-                    <div class="flex items-center space-x-5">
-                        <a href="https://github.com/D3vle0" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
-                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
-                                <img src="https://avatars.githubusercontent.com/u/44903787?v=4" alt="D3vle0 avatar" class="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <p class="font-medium text-lg tracking-tight group-hover:underline">D3vle0</p>
-                                <p class="text-xs text-gray-400 tracking-tight">leo [at] katusa [dot] xyz</p>
-                            </div>
-                        </a>
+                <div id="members-list" class="space-y-6">
                     </div>
-                    <div class="flex items-center space-x-5">
-                        <a href="https://github.com/taewook427" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
-                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
-                                <img src="https://avatars.githubusercontent.com/u/144579627?v=4" alt="taewook427 avatar" class="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <p class="font-medium text-lg tracking-tight group-hover:underline">taewook427</p>
-                                <p class="text-xs text-gray-400 tracking-tight">ko [at] katusa [dot] xyz</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="flex items-center space-x-5">
-                        <a href="https://github.com/heon-1219" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
-                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
-                                <img src="https://avatars.githubusercontent.com/heon-1219" alt="heon-1219 avatar" class="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <p class="font-medium text-lg tracking-tight group-hover:underline">heon-1219</p>
-                                <p class="text-xs text-gray-400 tracking-tight">GitHub Member</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="flex items-center space-x-5">
-                        <a href="https://github.com/kimdongyeong0" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
-                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
-                                <img src="https://avatars.githubusercontent.com/kimdongyeong0" alt="kimdongyeong0 avatar" class="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <p class="font-medium text-lg tracking-tight group-hover:underline">kimdongyeong0</p>
-                                <p class="text-xs text-gray-400 tracking-tight">GitHub Member</p>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="flex items-center space-x-5">
-                        <a href="https://github.com/yoonchanyeong" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
-                            <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
-                                <img src="https://avatars.githubusercontent.com/yoonchanyeong" alt="yoonchanyeong avatar" class="w-full h-full object-cover" />
-                            </div>
-                            <div>
-                                <p class="font-medium text-lg tracking-tight group-hover:underline">yoonchanyeong</p>
-                                <p class="text-xs text-gray-400 tracking-tight">GitHub Member</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
             </div>
-
-            <!-- Shortcuts Box -->
+            <!-- Shortcuts Card -->
             <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow mt-8 xl:mt-0 animate__animated animate__fadeInUp">
                 <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">Shortcuts</h2>
-                <div class="flex flex-wrap gap-3">
-                    <a href="https://zkzzk.katusa.xyz" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                        <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">Zkzzk</span>
-                    </a>
-                    <a href="https://radio.katusa.xyz" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/10 to-green-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                        <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">ASMR</span>
-                    </a>
-                    <a href="https://docs.katusa.xyz" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                        <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">Guide Docs</span>
-                    </a>
-                    <a href="https://status.katusa.xyz" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/10 to-green-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                        <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">Status</span>
-                    </a>
-                    <a href="https://mc-ping-check.vercel.app/?url=mc.katusa.xyz" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-blue-500/10 to-blue-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                        <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">Ping Check</span>
-                    </a>
-                    <a href="https://github.com/k-atusa" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 overflow-hidden">
-                        <div class="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/10 to-green-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                        <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">Github</span>
-                    </a>
-                </div>
+                <div id="shortcuts-list" class="flex flex-wrap gap-3">
+                    </div>
             </div>
         </div>
     </div>
@@ -191,33 +106,93 @@
     </footer>
 
     <script>
+        // --- 1. Animation Init ---
         new TypeIt("#title", {
             speed: 75,
             waitUntilVisible: true,
             cursor: false
         }).go();
 
-        // D-day Counter
+        // --- 2. Data Definition ---
+        const members = [
+            { id: 'D3vle0', sub: 'leo [at] katusa [dot] xyz', avatar: 'https://avatars.githubusercontent.com/u/44903787?v=4' },
+            { id: 'taewook427', sub: 'ko [at] katusa [dot] xyz', avatar: 'https://avatars.githubusercontent.com/u/144579627?v=4' },
+            { id: 'heon-1219', sub: 'GitHub Member', avatar: 'https://avatars.githubusercontent.com/heon-1219' },
+            { id: 'kimdongyeong0', sub: 'GitHub Member', avatar: 'https://avatars.githubusercontent.com/kimdongyeong0' },
+            { id: 'yoonchanyeong', sub: 'GitHub Member', avatar: 'https://avatars.githubusercontent.com/yoonchanyeong' }
+        ];
+
+        const shortcuts = [
+            { name: 'Github', url: 'https://github.com/k-atusa', color: 'blue' },
+            { name: 'YAS', url: 'https://yas.katusa.xyz', color: 'green' },
+            { name: 'Zkzzk', url: 'https://zkzzk.katusa.xyz', color: 'green' },
+            { name: 'ASMR', url: 'https://radio.katusa.xyz', color: 'green' },
+            { name: 'Barracks Layout', url: 'https://barracks-layout-simulator.vercel.app', color: 'blue' },
+            { name: 'Guide Docs', url: 'https://docs.katusa.xyz', color: 'blue' },
+            { name: 'Status', url: 'https://status.katusa.xyz', color: 'green' },
+            { name: 'Ping Check', url: 'https://mc-ping-check.vercel.app/?url=mc.katusa.xyz', color: 'blue' },
+        ];
+
+        // --- 3. Render Functions ---
+        const renderMembers = () => {
+            const container = document.getElementById('members-list');
+            container.innerHTML = members.map(m => `
+                <div class="flex items-center space-x-5">
+                    <a href="https://github.com/${m.id}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
+                        <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
+                            <img src="${m.avatar}" alt="${m.id} avatar" class="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                            <p class="font-medium text-lg tracking-tight group-hover:underline">${m.id}</p>
+                            <p class="text-xs text-gray-400 tracking-tight">${m.sub}</p>
+                        </div>
+                    </a>
+                </div>
+            `).join('');
+        };
+
+        const renderShortcuts = () => {
+            const container = document.getElementById('shortcuts-list');
+            container.innerHTML = shortcuts.map(s => {
+                const colorClass = s.color === 'blue' 
+                    ? 'hover:border-blue-400/30 from-blue-500/0 via-blue-500/10 to-blue-500/0' 
+                    : 'hover:border-green-400/30 from-green-500/0 via-green-500/10 to-green-500/0';
+                
+                return `
+                <a href="${s.url}" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 overflow-hidden ${colorClass.split(' ')[0]}">
+                    <div class="absolute inset-0 bg-gradient-to-r ${colorClass.split(' ').slice(1).join(' ')} translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                    <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">${s.name}</span>
+                </a>`;
+            }).join('');
+        };
+
+        // --- 4. Logic & Initialize ---
         function updateDday() {
             const enlistDate = new Date('2025-03-04T00:00:00+09:00');
             const targetDate = new Date('2026-09-03T00:00:00+09:00');
             const today = new Date();
+            
+            // D-Day
             const diffTime = targetDate - today;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             document.getElementById('dday').textContent = `D-${diffDays}`;
 
-            // Percent calculation
+            // Percent
             const total = targetDate - enlistDate;
             const done = today - enlistDate;
             let percent = Math.max(0, Math.min(1, done / total));
             percent = isNaN(percent) ? 0 : percent;
             const percentNum = (percent * 100).toFixed(7);
+            
             document.getElementById('percent-bar').style.width = percentNum + '%';
             document.getElementById('percent-text').textContent = percentNum + '%';
         }
 
+        // Init
+        renderMembers();
+        renderShortcuts();
         updateDday();
-        setInterval(updateDday, 50); // Update every 50ms for real-time percentage
+        setInterval(updateDday, 50);
     </script>
 </body>
 </html>
