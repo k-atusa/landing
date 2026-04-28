@@ -1,199 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KATUSA Programming Club</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KATUSA Programming Club - Terminal</title>
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/8/8f/Eighth_Army_Logo_with_MSC_Logos.png" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <script src="https://unpkg.com/typeit@8.7.1/dist/index.umd.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@500;600&display=swap" />
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #000000 0%, #0a0a0a 100%);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            position: relative;
-            overflow-x: hidden;
+            margin: 0;
+            min-height: 100vh;
+            font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+            background: #000000;
+            color: #e6e6e6;
+            padding: 8px 12px 16px;
         }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
+
+        .terminal-body {
             width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(62, 84, 172, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(255, 82, 82, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+            min-height: calc(100vh - 24px);
+            margin: 0;
+            overflow-y: auto;
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            position: relative;
-            z-index: 1;
+
+        .output {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+
+        .line {
+            white-space: pre-wrap;
+            line-height: 1.3;
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.02em;
-            position: relative;
-            z-index: 1;
+
+        .line.muted {
+            color: #b4b4b4;
         }
-        .avatar-circle {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+
+        .line.warning {
+            color: #ff7b72;
         }
-        .hover-glow:hover {
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+
+        .line.accent {
+            color: #8bff8b;
         }
-        /* Common card wrapper styles extracted for cleaner HTML */
-        .card-wrapper {
-            @apply glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow animate__animated animate__fadeInUp;
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+
+        .prompt-line {
+            display: flex;
+            gap: 1ch;
+            align-items: baseline;
+            margin-top: 2px;
+        }
+
+        .prompt {
+            color: #8bff8b;
+        }
+
+        #command-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            color: #e6e6e6;
+            flex: 1;
+            font: inherit;
+            line-height: 1.3;
+            white-space: pre-wrap;
+            word-break: break-word;
+            caret-color: transparent;
+            min-width: 1ch;
+        }
+
+        #command-input:empty::before {
+            content: attr(data-placeholder);
+            color: #707070;
+        }
+
+        #command-input::after {
+            content: " ";
+            display: inline-block;
+            width: 0.72ch;
+            height: 1em;
+            background: #e6e6e6;
+            margin-left: 0.12ch;
+            transform: translateY(0.15em);
+            animation: block-blink 1s steps(1) infinite;
+        }
+
+        #command-input.is-disabled::after {
+            display: none;
+        }
+
+        @keyframes block-blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 4px 6px 12px;
+            }
+
+            .terminal-body {
+                min-height: calc(100vh - 16px);
+            }
         }
     </style>
 </head>
-<body class="min-h-screen text-white">
-    <div class="container mx-auto px-4 z-10 relative">
-        <div class="text-center pt-20">
-            <h1 id="title" class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold gradient-text animate__animated animate__fadeInUp tracking-tight"> KATUSA PROGRAMMING CLUB </h1>
-            <div class="mt-2 text-lg text-gray-400 font-semibold animate__animated animate__fadeInUp animate__delay-0_5s"> Cycle 06-25 </div>
+<body>
+    <main class="terminal-body" id="terminal">
+        <div class="output" id="output"></div>
+        <div class="prompt-line" style="display: none;">
+            <span class="prompt">katusa@humphreys:~$</span>
+            <span id="command-input" contenteditable="false" spellcheck="false" class="is-disabled"></span>
         </div>
-
-        <div class="flex flex-col xl:flex-row flex-wrap justify-center gap-8 lg:gap-10 mt-16 lg:mt-24 items-center">
-            <!-- ETS Counter Card -->
-            <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow animate__animated animate__fadeInUp">
-                <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">ETS Counter</h2>
-                <div id="dday" class="text-5xl font-bold text-white tracking-tight">Loading...</div>
-                <div class="mt-8">
-                    <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
-                        <div id="percent-bar" class="h-3 bg-gradient-to-r from-blue-400 to-blue-600" style="width:0%"></div>
-                    </div>
-                    <div class="mt-2 text-right text-sm text-gray-300 font-medium">
-                        <span id="percent-text">0%</span> completed
-                    </div>
-                </div>
-            </div>
-            <!-- Club Members Card -->
-            <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow mt-8 lg:mt-0 animate__animated animate__fadeInUp">
-                <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">Club Members</h2>
-                <div id="members-list" class="space-y-6">
-                    </div>
-            </div>
-            <!-- Shortcuts Card -->
-            <div class="glass-card rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-xs sm:max-w-sm md:max-w-md lg:w-[420px] transform hover:scale-105 transition-all duration-300 hover-glow mt-8 xl:mt-0 animate__animated animate__fadeInUp">
-                <h2 class="text-2xl font-semibold text-gray-300 mb-8 tracking-tight">Shortcuts</h2>
-                <div id="shortcuts-list" class="flex flex-wrap gap-3">
-                    </div>
-            </div>
-        </div>
-    </div>
-
-    <footer class="w-full mt-16 mb-4 flex flex-col items-center text-gray-400 text-sm select-none">
-        <div class="animate__animated animate__fadeInUp">&copy; 2025 KATUSA Programming Club. All rights reserved.</div>
-        <div class="mt-1 animate__animated animate__fadeInUp">made by <span class="font-semibold text-white">D3vle0</span> with <span class="text-red-500">❤</span></div>
-    </footer>
+    </main>
 
     <script>
-        // --- 1. Animation Init ---
-        new TypeIt("#title", {
-            speed: 75,
-            waitUntilVisible: true,
-            cursor: false
-        }).go();
-
-        // --- 2. Data Definition ---
         const members = [
-            { id: 'D3vle0', sub: 'leo [at] katusa [dot] xyz', avatar: 'https://avatars.githubusercontent.com/u/44903787?v=4' },
-            { id: 'taewook427', sub: 'ko [at] katusa [dot] xyz', avatar: 'https://avatars.githubusercontent.com/u/144579627?v=4' },
-            { id: 'heon-1219', sub: 'GitHub Member', avatar: 'https://avatars.githubusercontent.com/heon-1219' },
-            { id: 'kimdongyeong0', sub: 'GitHub Member', avatar: 'https://avatars.githubusercontent.com/kimdongyeong0' },
-            { id: 'yoonchanyeong', sub: 'GitHub Member', avatar: 'https://avatars.githubusercontent.com/yoonchanyeong' }
+            { id: "D3vle0", sub: "leo [at] katusa [dot] xyz" },
+            { id: "taewook427", sub: "ko [at] katusa [dot] xyz" },
+            { id: "heon-1219", sub: "GitHub Member" },
+            { id: "kimdongyeong0", sub: "GitHub Member" },
+            { id: "yoonchanyeong", sub: "GitHub Member" }
         ];
 
         const shortcuts = [
-            { name: 'Github', url: 'https://github.com/k-atusa', color: 'blue' },
-            { name: 'YAS-web', url: 'https://yas.katusa.xyz', color: 'green' },
-            { name: 'YAS-lite', url: 'https://taewook427.github.io/SimpleWeb/YAS-web-lite/index.html', color: 'blue' },
-            { name: 'Zkzzk', url: 'https://zkzzk.katusa.xyz', color: 'green' },
-            { name: 'ASMR', url: 'https://radio.katusa.xyz', color: 'green' },
-            { name: 'Barracks Layout', url: 'https://barracks-layout-simulator.vercel.app', color: 'blue' },
-            { name: 'Guide Docs', url: 'https://docs.katusa.xyz', color: 'blue' },
-            { name: 'Status', url: 'https://status.katusa.xyz', color: 'green' },
-            { name: 'Ping Check', url: 'https://mc-ping-check.vercel.app/?url=mc.katusa.xyz', color: 'blue' },
+            { name: "Github", url: "https://github.com/k-atusa" },
+            { name: "YAS-web", url: "https://yas.katusa.xyz" },
+            { name: "YAS-lite", url: "https://taewook427.github.io/SimpleWeb/YAS-web-lite/index.html" },
+            { name: "Zkzzk", url: "https://zkzzk.katusa.xyz" },
+            { name: "ASMR", url: "https://radio.katusa.xyz" },
+            { name: "Barracks Layout", url: "https://barracks-layout-simulator.vercel.app" },
+            { name: "Guide Docs", url: "https://docs.katusa.xyz" },
+            { name: "Status", url: "https://status.katusa.xyz" },
+            { name: "Ping Check", url: "https://mc-ping-check.vercel.app/?url=mc.katusa.xyz" }
         ];
 
-        // --- 3. Render Functions ---
-        const renderMembers = () => {
-            const container = document.getElementById('members-list');
-            container.innerHTML = members.map(m => `
-                <div class="flex items-center space-x-5">
-                    <a href="https://github.com/${m.id}" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-5 group">
-                        <div class="avatar-circle w-14 h-14 rounded-full flex items-center justify-center overflow-hidden group-hover:ring-2 group-hover:ring-blue-400 transition">
-                            <img src="${m.avatar}" alt="${m.id} avatar" class="w-full h-full object-cover" />
-                        </div>
-                        <div>
-                            <p class="font-medium text-lg tracking-tight group-hover:underline">${m.id}</p>
-                            <p class="text-xs text-gray-400 tracking-tight">${m.sub}</p>
-                        </div>
-                    </a>
-                </div>
-            `).join('');
-        };
+        const commandInput = document.getElementById("command-input");
+        const output = document.getElementById("output");
+        const terminal = document.getElementById("terminal");
 
-        const renderShortcuts = () => {
-            const container = document.getElementById('shortcuts-list');
-            container.innerHTML = shortcuts.map(s => {
-                const colorClass = s.color === 'blue' 
-                    ? 'hover:border-blue-400/30 from-blue-500/0 via-blue-500/10 to-blue-500/0' 
-                    : 'hover:border-green-400/30 from-green-500/0 via-green-500/10 to-green-500/0';
-                
-                return `
-                <a href="${s.url}" target="_blank" class="flex-1 min-w-[45%] group relative flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300 overflow-hidden ${colorClass.split(' ')[0]}">
-                    <div class="absolute inset-0 bg-gradient-to-r ${colorClass.split(' ').slice(1).join(' ')} translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                    <span class="text-sm font-medium text-gray-300 group-hover:text-white z-10">${s.name}</span>
-                </a>`;
-            }).join('');
-        };
+        const history = [];
+        let historyIndex = -1;
 
-        // --- 4. Logic & Initialize ---
-        function updateDday() {
-            const enlistDate = new Date('2025-03-04T00:00:00+09:00');
-            const targetDate = new Date('2026-09-03T00:00:00+09:00');
-            const today = new Date();
-            
-            // D-Day
-            const diffTime = targetDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            document.getElementById('dday').textContent = `D-${diffDays}`;
+        const enlistDate = new Date("2025-03-04T00:00:00+09:00");
+        const targetDate = new Date("2026-09-03T00:00:00+09:00");
 
-            // Percent
-            const total = targetDate - enlistDate;
-            const done = today - enlistDate;
-            let percent = Math.max(0, Math.min(1, done / total));
-            percent = isNaN(percent) ? 0 : percent;
-            const percentNum = (percent * 100).toFixed(7);
-            
-            document.getElementById('percent-bar').style.width = percentNum + '%';
-            document.getElementById('percent-text').textContent = percentNum + '%';
+        const banner = [
+            " _  __ _   _ _____ _   _  ____   ___  ",
+            "| |/ /| | | |_   _| | | |/ ___| / _ \\",
+            "| ' / | | | | | | | | | | |  _ | | | |",
+            "| . \\ | |_| | | | | |_| | |_| || |_| |",
+            "|_|\\_\\ \\___/  |_|  \\___/ \\____(_)___/ ",
+            "KATUSA PROGRAMMING CLUB - Cycle 06-25"
+        ];
+
+        function escapeHtml(value) {
+            return value
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        // Init
-        renderMembers();
-        renderShortcuts();
-        updateDday();
-        setInterval(updateDday, 50);
+        function printLine(text, className = "", isHtml = false) {
+            const line = document.createElement("div");
+            line.className = `line ${className}`.trim();
+            if (isHtml) {
+                line.innerHTML = text;
+            } else {
+                line.textContent = text;
+            }
+            output.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+
+        function printBlock(text, className = "block") {
+            printLine(text, className, true);
+        }
+
+        function formatPercent(value) {
+            return `${value.toFixed(3)}%`;
+        }
+
+        function etsStatus() {
+            const now = new Date();
+            const diffTime = targetDate - now;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const total = targetDate - enlistDate;
+            const done = now - enlistDate;
+            const ratio = Math.max(0, Math.min(1, done / total));
+            const percent = ratio * 100;
+            const barLength = 22;
+            const filled = Math.round(ratio * barLength);
+            const bar = `[${"#".repeat(filled)}${"-".repeat(barLength - filled)}]`;
+            return { diffDays, percent, bar };
+        }
+
+
+        function commandHelp() {
+            return [
+                "help       show available commands",
+                "about      club overview",
+                "banner     show club banner",
+                "members    list member handles",
+                "shortcuts  list site launchers",
+                "open NAME  open shortcut in new tab",
+                "ets        ETS countdown + progress",
+                "cycle      show active cycle",
+                "date       show current date",
+                "ls         list files",
+                "cat FILE   show file contents",
+                "clear      clear terminal",
+                "whoami     show user"
+            ].join("\n");
+        }
+
+        function findShortcut(term) {
+            if (!term) {
+                return null;
+            }
+            const trimmed = term.trim().toLowerCase();
+            const byIndex = Number.parseInt(trimmed, 10);
+            if (!Number.isNaN(byIndex) && shortcuts[byIndex - 1]) {
+                return shortcuts[byIndex - 1];
+            }
+            return shortcuts.find((shortcut) => {
+                const normalized = shortcut.name.toLowerCase().replace(/\s+/g, "");
+                return shortcut.name.toLowerCase() === trimmed || normalized === trimmed;
+            });
+        }
+
+        function showMembers() {
+            const lines = members
+                .map((member, index) => {
+                    const count = String(index + 1).padStart(2, "0");
+                    return `${count}. ${member.id} :: ${member.sub}`;
+                })
+                .join("\n");
+            printBlock(`<pre>${escapeHtml(lines)}</pre>`);
+        }
+
+        function showShortcuts() {
+            const lines = shortcuts
+                .map((shortcut, index) => {
+                    return `${index + 1}. ${shortcut.name} -> ${shortcut.url}`;
+                })
+                .join("\n");
+            printBlock(`<pre>${escapeHtml(lines)}</pre>`);
+        }
+
+        function showAbout() {
+            const text = [
+                "KATUSA Programming Club",
+                "Cycle 06-25",
+                "Community hub for building, shipping, and sharing tools.",
+                "Type 'members' or 'shortcuts' to explore."
+            ].join("\n");
+            printBlock(`<pre>${escapeHtml(text)}</pre>`);
+        }
+
+        function showEts() {
+            const { diffDays, percent, bar } = etsStatus();
+            const text = [
+                `ETS Countdown: D-${diffDays}`,
+                `Progress: ${bar} ${formatPercent(percent)}`
+            ].join("\n");
+            printBlock(`<pre>${escapeHtml(text)}</pre>`);
+        }
+
+        function showLs() {
+            printLine("README.md  members  shortcuts  ets", "muted");
+        }
+
+        function showCat(target) {
+            if (target !== "README.md") {
+                printLine(`cat: ${target}: No such file`, "warning");
+                return;
+            }
+            const text = [
+                "Welcome to KATUSA Programming Club.",
+                "- Cycle: 06-25",
+                "- Commands: help, members, shortcuts, ets",
+                "- Tip: open <name> launches a site.",
+                "",
+                "Status channel: https://status.katusa.xyz",
+                "Docs: https://docs.katusa.xyz"
+            ].join("\n");
+            printBlock(`<pre>${escapeHtml(text)}</pre>`);
+        }
+
+        function runCommand(rawInput) {
+            const input = rawInput.trim();
+            if (!input) {
+                return;
+            }
+
+            history.push(input);
+            historyIndex = history.length;
+            printLine(`<span class="prompt">katusa@humphreys:~$</span> ${escapeHtml(input)}`, "", true);
+
+            const [command, ...args] = input.split(" ");
+            const argString = args.join(" ");
+
+            switch (command.toLowerCase()) {
+                case "help":
+                    printBlock(`<pre>${escapeHtml(commandHelp())}</pre>`);
+                    break;
+                case "about":
+                    showAbout();
+                    break;
+                case "banner":
+                    printBlock(`<pre>${escapeHtml(banner.join("\n"))}</pre>`);
+                    break;
+                case "members":
+                    showMembers();
+                    break;
+                case "shortcuts":
+                    showShortcuts();
+                    break;
+                case "open": {
+                    const target = findShortcut(argString);
+                    if (!target) {
+                        printLine("open: specify a valid shortcut name or index", "warning");
+                        break;
+                    }
+                    window.open(target.url, "_blank", "noopener,noreferrer");
+                    printLine(`launching: ${target.name}`, "muted");
+                    break;
+                }
+                case "ets":
+                    showEts();
+                    break;
+                case "cycle":
+                    printLine("Cycle 06-25", "muted");
+                    break;
+                case "date":
+                    printLine(new Date().toString(), "muted");
+                    break;
+                case "whoami":
+                    printLine("katusa", "muted");
+                    break;
+                case "ls":
+                    showLs();
+                    break;
+                case "cat":
+                    showCat(argString || "");
+                    break;
+                case "clear":
+                    output.innerHTML = "";
+                    break;
+                default:
+                    printLine(`command not found: ${command}`, "warning");
+            }
+        }
+
+        function placeCaretAtEnd(element) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        function bootSequence() {
+            const bootStart = performance.now();
+            const bootLogs = [
+                { text: "Loading Linux 6.8.9-amd64 ...", delay: 100 },
+                { text: "Loading initial ramdisk ...", delay: 150 },
+                { text: "[    0.000000] Linux version 6.8.9-amd64 (debian-kernel@lists.debian.org) (gcc-13 (Debian 13.2.0-24) 13.2.0, GNU ld (Debian 13.2.0-24) 2.42) #1 SMP PREEMPT_DYNAMIC Debian 6.8.9-1 (2026-04-20)", delay: 80 },
+                { text: "[    0.000000] Command line: BOOT_IMAGE=/boot/vmlinuz-6.8.9-amd64 root=UUID=8d3e... ro quiet loglevel=3", delay: 50 },
+                { text: "[    0.000000] KERNEL supported cpus: Intel", delay: 30 },
+                { text: "[    0.000000] x86/fpu: x87 FPU will use FXSAVE", delay: 30 },
+                { text: "[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point registers'", delay: 30 },
+                { text: "[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'", delay: 30 },
+                { text: "[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'", delay: 30 },
+                { text: "[    0.000000] BIOS-provided physical RAM map:", delay: 40 },
+                { text: "[    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable", delay: 20 },
+                { text: "[    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved", delay: 20 },
+                { text: "[    0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000003fffffff] usable", delay: 20 },
+                { text: "[    0.000000] NX (Execute Disable) protection: active", delay: 30 },
+                { text: "[    0.000000] e820: update [mem 0x00000000-0x00000fff] usable ==> reserved", delay: 30 },
+                { text: "[    0.000000] SMBIOS 3.2.1 present.", delay: 30 },
+                { text: "[    0.000000] DMI: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2 04/01/2014", delay: 40 },
+                { text: "[    0.000000] secureboot: Secure boot disabled", delay: 40 },
+                { text: "[    0.000000] tsc: Fast TSC calibration using PIT", delay: 30 },
+                { text: "[    0.000000] smp: Bringing up secondary CPUs ...", delay: 40 },
+                { text: "[    0.000000] smp: Brought up 8 nodes, 16 CPUs", delay: 40 },
+                { text: "[    0.000000] kernel: spectre_v2: Mitigation: Retpolines", delay: 30 },
+                { text: "[    0.000000] random: crng init done", delay: 30 },
+                { text: "[    0.000000] HugeTLB registered 1.00 GiB page size", delay: 30 },
+                { text: "[    0.000000] RCU: Hierarchical SRCU implementation.", delay: 30 },
+                { text: "[    0.000000] ACPI: PM-Timer IO Port: 0x608", delay: 30 },
+                { text: "[    0.000000] PCI: Using ACPI for IRQ routing", delay: 30 },
+                { text: "[    0.000000] Freeing initrd memory: 52148K", delay: 80 },
+                { text: "[    0.000000] pci 0000:00:02.0: vgaarb: setting as boot VGA device", delay: 50 },
+                { text: "[    0.000000] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x1d1a, max_idle_ns: 440795203123 ns", delay: 40 },
+                { text: "[    0.000000] usb 1-1: new high-speed USB device number 2 using xhci_hcd", delay: 80 },
+                { text: "[    0.000000] usb 1-1: New USB device found, idVendor=0627, idProduct=0001", delay: 40 },
+                { text: "[    0.000000] input: QEMU QEMU USB Mouse as /devices/pci0000:00/0000:00:04.0/usb1/1-1/input/input3", delay: 40 },
+                { text: "[    0.000000] EXT4-fs (sda2): mounted filesystem with ordered data mode. Quota mode: none.", delay: 60 },
+                { text: "[    0.000000] systemd[1]: Inserted module 'autofs4'", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Mounted root file system.", delay: 100 },
+                { text: "[    0.000000] systemd[1]: systemd 255.4-1+b1 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +CGROUP_V2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -P11KIT -ELFUTILS +FIDO2 -TPM2 +AMQP -ENCRYPT_PWD +IDN2 -BTRFS +P11KIT -LIBCRYPTSETUP +LIBFIDO2)", delay: 80 },
+                { text: "[    0.000000] systemd[1]: Detected virtualization kvm.", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Detected architecture x86-64.", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Hostname set to <humphreys>.", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Initializing machine ID from /etc/machine-id.", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Starting Journal Service...", delay: 50 },
+                { text: "[    0.000000] systemd-journald[349]: Journal started", delay: 50 },
+                { text: "[    0.000000] systemd[1]: Starting Load Kernel Modules...", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Starting Apply Kernel Variables...", delay: 40 },
+                { text: "[    0.000000] systemd[1]: Starting udev Kernel Device Manager...", delay: 40 },
+                { text: "[    0.000000] systemd-udevd[392]: Using default interface naming scheme 'v255'.", delay: 40 },
+                { text: "[    0.000000] systemd-udevd[392]: ethtool: autonegotiation is unset or enabled, the speed and duplex are not writable.", delay: 40 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Created slice system-getty.slice - Slice /system/getty.", delay: 40 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Created slice system-modprobe.slice - Slice /system/modprobe.", delay: 40 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Created slice system-udevd.slice - Slice /system/udevd.", delay: 40 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Reached target Local File Systems.", delay: 50 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started Load Kernel Modules.", delay: 40 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started Apply Kernel Variables.", delay: 40 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started udev Kernel Device Manager.", delay: 50 },
+                { text: "         Mounting Kernel Configuration File System...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Mounted Kernel Configuration File System.", delay: 50 },
+                { text: "         Starting Create System Users...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started Create System Users.", delay: 40 },
+                { text: "         Starting udev Coldplug all Devices...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started udev Coldplug all Devices.", delay: 50 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started Show Plymouth Boot Screen.", delay: 30 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Reached target Paths.", delay: 30 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Reached target Basic System.", delay: 40 },
+                { text: "         Starting D-Bus System Message Bus...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started D-Bus System Message Bus.", delay: 60 },
+                { text: "         Starting Network Manager...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started Network Manager.", delay: 100 },
+                { text: "         Starting OpenSSH Server...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started OpenSSH Server.", delay: 80 },
+                { text: "         Starting System Logging Service...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started System Logging Service.", delay: 60 },
+                { text: "         Starting KATUSA Container Services...", delay: 80 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started KATUSA Container Services.", delay: 150 },
+                { text: "         Starting Getty on tty1...", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Started Getty on tty1.", delay: 60 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Reached target Multi-User System.", delay: 50 },
+                { text: "[  <span class=\"accent\">OK</span>  ] Reached target Graphical Interface.", delay: 80 },
+                { text: " ", delay: 10 },
+                { text: "Debian GNU/Linux 13 humphreys tty1", delay: 50 },
+                { text: "humphreys login: katusa (automatic login)", delay: 200 },
+                { text: "Last login: " + new Date().toString().split(" GMT")[0] + " on tty1", delay: 150 }
+            ];
+
+            let totalDelay = 0;
+            bootLogs.forEach((log) => {
+                const jitter = 30 + Math.floor(Math.random() * 130);
+                totalDelay += log.delay + jitter;
+                setTimeout(() => {
+                    let text = log.text;
+                    if (/^\[\s*\d+\.\d+\]/.test(text)) {
+                        const elapsed = (performance.now() - bootStart) / 1000;
+                        const stamp = elapsed.toFixed(6).padStart(10, " ");
+                        text = text.replace(/^\[\s*\d+\.\d+\]/, `[${stamp}]`);
+                    }
+                    printLine(text, "muted", text.includes("<span"));
+                }, totalDelay);
+            });
+
+            setTimeout(() => {
+                const promptLine = document.querySelector(".prompt-line");
+                promptLine.style.display = "flex";
+                commandInput.setAttribute("contenteditable", "true");
+                commandInput.classList.remove("is-disabled");
+                commandInput.focus();
+                placeCaretAtEnd(commandInput);
+                terminal.scrollTop = terminal.scrollHeight;
+                window.scrollTo(0, document.body.scrollHeight);
+            }, totalDelay + 100);
+        }
+
+        commandInput.addEventListener("keydown", (event) => {
+            if (commandInput.getAttribute("contenteditable") !== "true") {
+                return;
+            }
+            if (event.key === "Enter") {
+                event.preventDefault();
+                runCommand(commandInput.textContent || "");
+                commandInput.textContent = "";
+                placeCaretAtEnd(commandInput);
+            }
+
+            if (event.key === "ArrowUp") {
+                if (history.length === 0) {
+                    return;
+                }
+                historyIndex = Math.max(0, historyIndex - 1);
+                commandInput.textContent = history[historyIndex] || "";
+                placeCaretAtEnd(commandInput);
+                event.preventDefault();
+            }
+
+            if (event.key === "ArrowDown") {
+                if (history.length === 0) {
+                    return;
+                }
+                historyIndex = Math.min(history.length, historyIndex + 1);
+                commandInput.textContent = history[historyIndex] || "";
+                placeCaretAtEnd(commandInput);
+                event.preventDefault();
+            }
+        });
+
+        bootSequence();
+
+        window.addEventListener("click", () => {
+            if (commandInput.getAttribute("contenteditable") === "true") {
+                commandInput.focus();
+                placeCaretAtEnd(commandInput);
+            }
+        });
     </script>
 </body>
 </html>
