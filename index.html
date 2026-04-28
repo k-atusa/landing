@@ -11,18 +11,23 @@
             box-sizing: border-box;
         }
 
+        html,
+        body {
+            height: 100%;
+        }
+
         body {
             margin: 0;
-            min-height: 100vh;
             font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
             background: #000000;
             color: #e6e6e6;
             padding: 8px 12px 16px;
+            overflow: hidden;
         }
 
         .terminal-body {
             width: 100%;
-            min-height: calc(100vh - 24px);
+            height: 100%;
             margin: 0;
             overflow-y: auto;
         }
@@ -113,10 +118,10 @@
                 padding: 4px 6px 12px;
             }
 
-            .terminal-body {
-                min-height: calc(100vh - 16px);
+                .terminal-body {
+                    height: 100%;
+                }
             }
-        }
     </style>
 </head>
 <body>
@@ -187,7 +192,6 @@
             }
             output.appendChild(line);
             terminal.scrollTop = terminal.scrollHeight;
-            window.scrollTo(0, document.body.scrollHeight);
         }
 
         function printBlock(text, className = "block") {
@@ -489,7 +493,6 @@
                 commandInput.focus();
                 placeCaretAtEnd(commandInput);
                 terminal.scrollTop = terminal.scrollHeight;
-                window.scrollTo(0, document.body.scrollHeight);
             }, totalDelay + 100);
         }
 
