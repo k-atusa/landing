@@ -175,13 +175,11 @@
         const enlistDate = new Date("2025-03-04T00:00:00+09:00");
         const targetDate = new Date("2026-09-03T00:00:00+09:00");
 
-        const initialHtml = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
         const fileFallbacks = {
             "CNAME": "katusa.space",
-            "README.md": "# landing\npowers katusa.xyz mainpage",
-            "index.html": initialHtml
+            "README.md": "# landing\npowers katusa.xyz mainpage"
         };
-        const fileList = Object.keys(fileFallbacks);
+        const fileList = ["CNAME", "README.md", "index.html"];
 
         function escapeHtml(value) {
             return value
@@ -308,7 +306,7 @@
                 return;
             }
             try {
-                const response = await fetch(target, { cache: "no-store" });
+                const response = await fetch(target);
                 if (!response.ok) {
                     throw new Error("not-found");
                 }
