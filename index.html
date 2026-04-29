@@ -607,12 +607,10 @@
                 return;
             }
             const now = new Date();
-            const existing = virtualEntries.get(destName);
-            const createdAt = existing?.createdAt ?? now;
             virtualEntries.set(destName, {
                 type: "file",
                 content: result.content,
-                createdAt,
+                createdAt: now,
                 updatedAt: now
             });
         }
