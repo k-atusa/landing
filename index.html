@@ -186,16 +186,16 @@
         const homeDirectory = "/home/katusa";
         const bootTimestamp = Date.now();
 
-        function escapeHtml(value) {
+        const escapeHtml = (value) => {
             return value
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
-                .replace(/\"/g, "&quot;")
+                .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
-        }
+        };
 
-        function printLine(text, className = "", isHtml = false) {
+        const printLine = (text, className = "", isHtml = false) => {
             const line = document.createElement("div");
             line.className = `line ${className}`.trim();
             if (isHtml) {
@@ -205,17 +205,15 @@
             }
             output.appendChild(line);
             terminal.scrollTop = terminal.scrollHeight;
-        }
+        };
 
-        function printBlock(text, className = "block") {
+        const printBlock = (text, className = "block") => {
             printLine(text, className, true);
-        }
+        };
 
-        function formatPercent(value) {
-            return `${value.toFixed(3)}%`;
-        }
+        const formatPercent = (value) => `${value.toFixed(3)}%`;
 
-        function normalizeEntryName(value) {
+        const normalizeEntryName = (value) => {
             if (typeof value !== "string") {
                 return "";
             }
@@ -224,17 +222,13 @@
                 return "";
             }
             return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
-        }
+        };
 
-        function isValidBaseName(value) {
-            return Boolean(value) && !value.includes("/") && value !== "." && value !== "..";
-        }
+        const isValidBaseName = (value) => Boolean(value) && !value.includes("/") && value !== "." && value !== "..";
 
-        function isSystemEntry(name) {
-            return Object.prototype.hasOwnProperty.call(files, name);
-        }
+        const isSystemEntry = (name) => Object.prototype.hasOwnProperty.call(files, name);
 
-        function getEntryInfo(name) {
+        const getEntryInfo = (name) => {
             const normalized = normalizeEntryName(name);
             if (virtualEntries.has(normalized)) {
                 return { source: "virtual", entry: virtualEntries.get(normalized) };
@@ -243,17 +237,17 @@
                 return { source: "system", entry: { type: "file", readOnly: true } };
             }
             return null;
-        }
+        };
 
-        function listEntries() {
+        const listEntries = () => {
             const entries = [...fileList];
             virtualEntries.forEach((entry, name) => {
                 entries.push(entry.type === "dir" ? `${name}/` : name);
             });
             return entries;
-        }
+        };
 
-        async function getFileContent(target) {
+        const getFileContent = async (target) => {
             const normalized = normalizeEntryName(target);
             const virtualEntry = virtualEntries.get(normalized);
             if (virtualEntry) {
@@ -290,9 +284,9 @@
                 return { content: fallbackValue };
             }
             return { error: "unreadable" };
-        }
+        };
 
-        function formatUptime(durationMs) {
+        const formatUptime = (durationMs) => {
             const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
             const days = Math.floor(totalSeconds / 86400);
             const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -303,14 +297,14 @@
             }
             parts.push(`${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`);
             return parts.join(", ");
-        }
+        };
 
-        function getLoadAverages() {
+        const getLoadAverages = () => {
             const base = [0.12, 0.08, 0.05];
             return base.map((value) => (value + Math.random() * 0.05).toFixed(2));
-        }
+        };
 
-        function etsStatus() {
+        const etsStatus = () => {
             const now = new Date();
             const diffTime = targetDate - now;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -322,11 +316,10 @@
             const filled = Math.round(ratio * barLength);
             const bar = `[${"#".repeat(filled)}${"-".repeat(barLength - filled)}]`;
             return { diffDays, percent, bar };
-        }
+        };
 
 
-        function commandHelp() {
-            return [
+        const commandHelp = () => [
                 "help       show available commands",
                 "about      club overview",
                 "members    list member handles",
@@ -353,9 +346,8 @@
                 "pwd        print working directory",
                 "whoami     show user"
             ].join("\n");
-        }
 
-        function findShortcut(term) {
+        const findShortcut = (term) => {
             if (!term) {
                 return null;
             }
@@ -368,9 +360,9 @@
                 const normalized = shortcut.name.toLowerCase().replace(/\s+/g, "");
                 return shortcut.name.toLowerCase() === trimmed || normalized === trimmed;
             });
-        }
+        };
 
-        function showMembers() {
+        const showMembers = () => {
             const lines = members
                 .map((member, index) => {
                     const count = String(index + 1).padStart(2, "0");
@@ -378,18 +370,18 @@
                 })
                 .join("\n");
             printBlock(`<pre>${escapeHtml(lines)}</pre>`);
-        }
+        };
 
-        function showShortcuts() {
+        const showShortcuts = () => {
             const lines = shortcuts
                 .map((shortcut, index) => {
                     return `${index + 1}. ${shortcut.name} -> ${shortcut.url}`;
                 })
                 .join("\n");
             printBlock(`<pre>${escapeHtml(lines)}</pre>`);
-        }
+        };
 
-        function showAbout() {
+        const showAbout = () => {
             const text = [
                 "KATUSA Programming Club",
                 "Cycle 06-25",
@@ -397,22 +389,22 @@
                 "Type 'members' or 'shortcuts' to explore."
             ].join("\n");
             printBlock(`<pre>${escapeHtml(text)}</pre>`);
-        }
+        };
 
-        function showEts() {
+        const showEts = () => {
             const { diffDays, percent, bar } = etsStatus();
             const text = [
                 `ETS Countdown: D-${diffDays}`,
                 `Progress: ${bar} ${formatPercent(percent)}`
             ].join("\n");
             printBlock(`<pre>${escapeHtml(text)}</pre>`);
-        }
+        };
 
-        function showLs() {
+        const showLs = () => {
             printLine(listEntries().join("  "), "muted");
-        }
+        };
 
-        async function showCat(target) {
+        const showCat = async (target) => {
             const normalized = normalizeEntryName(target);
             if (!normalized) {
                 printLine("cat: missing file operand", "warning");
@@ -432,39 +424,39 @@
                 return;
             }
             printBlock(`<pre>${escapeHtml(result.content)}</pre>`);
-        }
+        };
 
-        function showHistory() {
+        const showHistory = () => {
             const lines = history
                 .map((entry, index) => `${String(index + 1).padStart(4, " ")}  ${entry}`)
                 .join("\n");
             printBlock(`<pre>${escapeHtml(lines)}</pre>`);
-        }
+        };
 
-        function showEcho(text) {
+        const showEcho = (text) => {
             printLine(text ?? "");
-        }
+        };
 
-        function showHostname() {
+        const showHostname = () => {
             printLine(hostName, "muted");
-        }
+        };
 
-        function showUname() {
+        const showUname = () => {
             printLine(
                 `Linux ${hostName} 6.8.9-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.8.9-1 (2026-04-20) x86_64 GNU/Linux`,
                 "muted"
             );
-        }
+        };
 
-        function showUptime() {
+        const showUptime = () => {
             const now = new Date();
             const uptimeText = formatUptime(Date.now() - bootTimestamp);
             const loads = getLoadAverages();
             const time = now.toTimeString().split(" ")[0];
             printLine(`${time} up ${uptimeText}, 1 user, load average: ${loads.join(", ")}`, "muted");
-        }
+        };
 
-        function touchFiles(targets) {
+        const touchFiles = (targets) => {
             if (targets.length === 0) {
                 printLine("touch: missing file operand", "warning");
                 return;
@@ -491,9 +483,9 @@
                 const now = new Date();
                 virtualEntries.set(name, { type: "file", content: "", createdAt: now, updatedAt: now });
             });
-        }
+        };
 
-        function makeDirectories(targets) {
+        const makeDirectories = (targets) => {
             if (targets.length === 0) {
                 printLine("mkdir: missing operand", "warning");
                 return;
@@ -511,9 +503,9 @@
                 const now = new Date();
                 virtualEntries.set(name, { type: "dir", createdAt: now, updatedAt: now });
             });
-        }
+        };
 
-        function parseRmArgs(args) {
+        const parseRmArgs = (args) => {
             const options = { recursive: false, force: false };
             const targets = [];
             args.forEach((arg) => {
@@ -531,9 +523,9 @@
                 }
             });
             return { options, targets };
-        }
+        };
 
-        function removeEntries(args) {
+        const removeEntries = (args) => {
             const { options, targets } = parseRmArgs(args);
             if (targets.length === 0) {
                 printLine("rm: missing operand", "warning");
@@ -566,9 +558,9 @@
                 }
                 virtualEntries.delete(name);
             });
-        }
+        };
 
-        async function copyEntry(source, destination) {
+        const copyEntry = async (source, destination) => {
             const srcName = normalizeEntryName(source);
             if (!srcName) {
                 printLine("cp: missing file operand", "warning");
@@ -613,9 +605,9 @@
                 createdAt: now,
                 updatedAt: now
             });
-        }
+        };
 
-        function moveEntry(source, destination) {
+        const moveEntry = (source, destination) => {
             const srcName = normalizeEntryName(source);
             if (!srcName) {
                 printLine("mv: missing file operand", "warning");
@@ -650,9 +642,9 @@
             }
             virtualEntries.delete(srcName);
             virtualEntries.set(destName, { ...sourceEntry, updatedAt: new Date() });
-        }
+        };
 
-        function parseLineArgs(args, commandName) {
+        const parseLineArgs = (args, commandName) => {
             let count = 10;
             let targetIndex = 0;
             if (args[0] === "-n") {
@@ -676,9 +668,9 @@
                 return null;
             }
             return { count, target };
-        }
+        };
 
-        async function showLines(args, commandName, fromEnd = false) {
+        const showLines = async (args, commandName, fromEnd = false) => {
             const parsed = parseLineArgs(args, commandName);
             if (!parsed) {
                 return;
@@ -699,17 +691,17 @@
             const lines = result.content.split(/\r?\n/);
             const selected = fromEnd ? lines.slice(-parsed.count) : lines.slice(0, parsed.count);
             printBlock(`<pre>${escapeHtml(selected.join("\n"))}</pre>`);
-        }
+        };
 
-        async function showHead(args) {
+        const showHead = async (args) => {
             await showLines(args, "head");
-        }
+        };
 
-        async function showTail(args) {
+        const showTail = async (args) => {
             await showLines(args, "tail", true);
-        }
+        };
 
-        async function runCommand(rawInput) {
+        const runCommand = async (rawInput) => {
             const input = rawInput.trim();
             if (!input) {
                 return;
@@ -808,18 +800,18 @@
                 default:
                     printLine(`command not found: ${command}`, "warning");
             }
-        }
+        };
 
-        function placeCaretAtEnd(element) {
+        const placeCaretAtEnd = (element) => {
             const selection = window.getSelection();
             const range = document.createRange();
             range.selectNodeContents(element);
             range.collapse(false);
             selection.removeAllRanges();
             selection.addRange(range);
-        }
+        };
 
-        function bootSequence() {
+        const bootSequence = () => {
             const bootStart = performance.now();
             const bootLogs = [
                 { text: "Loading Linux 6.8.9-amd64 ...", delay: 100 },
@@ -930,7 +922,7 @@
                 placeCaretAtEnd(commandInput);
                 terminal.scrollTop = terminal.scrollHeight;
             }, totalDelay + 100);
-        }
+        };
 
         commandInput.addEventListener("keydown", async (event) => {
             if (commandInput.getAttribute("contenteditable") !== "true") {
