@@ -308,15 +308,17 @@
                 return;
             }
             const { path, fallback: fallbackValue } = fileEntry;
-            let fetchedText;
+            let fetchedText = null;
             try {
                 const response = await fetch(path);
                 if (response.ok) {
                     fetchedText = await response.text();
                     fileEntry.cache = fetchedText;
+                } else {
+                    fetchedText = null;
                 }
             } catch (error) {
-                console.warn(`cat: fetch failed for ${target} (${error?.name || "Error"})`);
+                console.warn(`cat: fetch failed for ${target} (${error?.message || error?.name || "Error"})`);
                 fetchedText = null;
             }
             if (typeof fetchedText === "string") {
