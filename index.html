@@ -305,21 +305,27 @@
                 printLine(`cat: ${target}: No such file`, "warning");
                 return;
             }
+            const fallback = fileFallbacks[target];
             try {
                 const response = await fetch(target);
-                if (!response.ok) {
-                    throw new Error(`File fetch failed: ${target} returned ${response.status}`);
+                if (response.ok) {
+                    const text = await response.text();
+                    printBlock(`<pre>${escapeHtml(text)}</pre>`);
+                    return;
                 }
-                const text = await response.text();
-                printBlock(`<pre>${escapeHtml(text)}</pre>`);
             } catch (error) {
-                const fallback = fileFallbacks[target];
                 if (fallback) {
                     printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
                     return;
                 }
-                printLine(`cat: ${target}: No such file`, "warning");
+                printLine(`cat: ${target}: Failed to read file`, "warning");
+                return;
             }
+            if (fallback) {
+                printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
+                return;
+            }
+            printLine(`cat: ${target}: Failed to read file`, "warning");
         }
 
         async function runCommand(rawInput) {
