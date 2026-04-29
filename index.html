@@ -175,11 +175,12 @@
         const enlistDate = new Date("2025-03-04T00:00:00+09:00");
         const targetDate = new Date("2026-09-03T00:00:00+09:00");
 
-        const fileFallbacks = {
-            "CNAME": "katusa.space",
-            "README.md": "# landing\npowers katusa.xyz mainpage"
+        const files = {
+            "CNAME": { fallback: "katusa.space" },
+            "README.md": { fallback: "# landing\npowers katusa.xyz mainpage" },
+            "index.html": {}
         };
-        const fileList = ["CNAME", "README.md", "index.html"];
+        const fileList = Object.keys(files);
 
         function escapeHtml(value) {
             return value
@@ -301,19 +302,25 @@
         }
 
         async function showCat(target) {
-            if (!fileList.includes(target)) {
+            const fileEntry = files[target];
+            if (!fileEntry) {
                 printLine(`cat: ${target}: No such file`, "warning");
                 return;
             }
-            const fallback = fileFallbacks[target];
+            const fallback = fileEntry.fallback;
+            let fetchedText;
             try {
                 const response = await fetch(target);
                 if (response.ok) {
-                    const text = await response.text();
-                    printBlock(`<pre>${escapeHtml(text)}</pre>`);
-                    return;
+                    fetchedText = await response.text();
                 }
-            } catch (error) {}
+            } catch (error) {
+                fetchedText = null;
+            }
+            if (typeof fetchedText === "string") {
+                printBlock(`<pre>${escapeHtml(fetchedText)}</pre>`);
+                return;
+            }
             if (fallback) {
                 printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
                 return;
