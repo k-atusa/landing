@@ -318,7 +318,7 @@
                     fetchedText = null;
                 }
             } catch (error) {
-                console.warn(`cat: fetch failed for ${target} (${error?.message || error?.name || "Error"})`);
+                console.warn(`cat: fetch failed for ${target} (${error?.message || error?.name || "Unknown error"})`);
                 fetchedText = null;
             }
             if (typeof fetchedText === "string") {
