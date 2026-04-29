@@ -176,9 +176,9 @@
         const targetDate = new Date("2026-09-03T00:00:00+09:00");
 
         const files = {
-            "CNAME": { path: "CNAME", fallback: "katusa.space" },
-            "README.md": { path: "README.md", fallback: "# landing\npowers katusa.xyz mainpage" },
-            "index.html": { path: "index.html", fallback: null }
+            "CNAME": { path: "CNAME", fallback: "katusa.space", cache: null },
+            "README.md": { path: "README.md", fallback: "# landing\npowers katusa.xyz mainpage", cache: null },
+            "index.html": { path: "index.html", fallback: null, cache: null }
         };
         const fileList = Object.keys(files);
 
@@ -313,13 +313,18 @@
                 const response = await fetch(path);
                 if (response.ok) {
                     fetchedText = await response.text();
+                    fileEntry.cache = fetchedText;
                 }
             } catch (error) {
-                console.warn(`cat: fetch failed for ${target}`, error);
+                console.warn(`cat: fetch failed for ${target} (${error?.name || "Error"})`);
                 fetchedText = null;
             }
             if (typeof fetchedText === "string") {
                 printBlock(`<pre>${escapeHtml(fetchedText)}</pre>`);
+                return;
+            }
+            if (typeof fileEntry.cache === "string") {
+                printBlock(`<pre>${escapeHtml(fileEntry.cache)}</pre>`);
                 return;
             }
             if (typeof fallbackValue === "string") {
