@@ -176,9 +176,9 @@
         const targetDate = new Date("2026-09-03T00:00:00+09:00");
 
         const files = {
-            "CNAME": { fallback: "katusa.space" },
-            "README.md": { fallback: "# landing\npowers katusa.xyz mainpage" },
-            "index.html": { fallback: () => `<!DOCTYPE html>\n${document.documentElement.outerHTML}` }
+            "CNAME": { path: "CNAME", fallback: "katusa.space" },
+            "README.md": { path: "README.md", fallback: "# landing\npowers katusa.xyz mainpage" },
+            "index.html": { path: "index.html", fallback: null }
         };
         const fileList = Object.keys(files);
 
@@ -307,24 +307,23 @@
                 printLine(`cat: ${target}: No such file`, "warning");
                 return;
             }
-            const fallbackValue = fileEntry.fallback;
+            const { path, fallback: fallbackValue } = fileEntry;
             let fetchedText;
             try {
-                const response = await fetch(target);
+                const response = await fetch(path);
                 if (response.ok) {
                     fetchedText = await response.text();
                 }
             } catch (error) {
-                console.warn("cat: fetch failed", error);
+                console.warn(`cat: fetch failed for ${target}`, error);
                 fetchedText = null;
             }
             if (typeof fetchedText === "string") {
                 printBlock(`<pre>${escapeHtml(fetchedText)}</pre>`);
                 return;
             }
-            const fallback = typeof fallbackValue === "function" ? fallbackValue() : fallbackValue;
-            if (typeof fallback === "string") {
-                printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
+            if (typeof fallbackValue === "string") {
+                printBlock(`<pre>${escapeHtml(fallbackValue)}</pre>`);
                 return;
             }
             printLine(`cat: ${target}: Failed to read file`, "warning");
