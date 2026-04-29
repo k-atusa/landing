@@ -313,14 +313,7 @@
                     printBlock(`<pre>${escapeHtml(text)}</pre>`);
                     return;
                 }
-            } catch (error) {
-                if (fallback) {
-                    printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
-                    return;
-                }
-                printLine(`cat: ${target}: Failed to read file`, "warning");
-                return;
-            }
+            } catch (error) {}
             if (fallback) {
                 printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
                 return;
