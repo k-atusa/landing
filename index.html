@@ -30,6 +30,7 @@
             margin: 0;
             padding: 8px 12px 16px;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .output {
@@ -41,6 +42,9 @@
         .line {
             white-space: pre-wrap;
             line-height: 1.3;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            max-width: 100%;
         }
 
         .line.muted {
@@ -59,6 +63,9 @@
             margin: 0;
             white-space: pre-wrap;
             font-family: inherit;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            max-width: 100%;
         }
 
         .prompt-line {
@@ -66,6 +73,8 @@
             gap: 1ch;
             align-items: baseline;
             margin-top: 2px;
+            flex-wrap: wrap;
+            min-width: 0;
         }
 
         .prompt {
@@ -84,6 +93,7 @@
             line-height: 1.3;
             white-space: pre-wrap;
             word-break: break-word;
+            overflow-wrap: anywhere;
             caret-color: transparent;
             min-width: 1ch;
         }
@@ -165,14 +175,13 @@
         const enlistDate = new Date("2025-03-04T00:00:00+09:00");
         const targetDate = new Date("2026-09-03T00:00:00+09:00");
 
-        const banner = [
-            " _  __ _   _ _____ _   _  ____   ___  ",
-            "| |/ /| | | |_   _| | | |/ ___| / _ \\",
-            "| ' / | | | | | | | | | | |  _ | | | |",
-            "| . \\ | |_| | | | | |_| | |_| || |_| |",
-            "|_|\\_\\ \\___/  |_|  \\___/ \\____(_)___/ ",
-            "KATUSA PROGRAMMING CLUB - Cycle 06-25"
-        ];
+        const initialHtml = `<!DOCTYPE html>\n${document.documentElement.outerHTML}`;
+        const fileFallbacks = {
+            "CNAME": "katusa.space",
+            "README.md": "# landing\npowers katusa.xyz mainpage",
+            "index.html": initialHtml
+        };
+        const fileList = Object.keys(fileFallbacks);
 
         function escapeHtml(value) {
             return value
@@ -222,16 +231,16 @@
             return [
                 "help       show available commands",
                 "about      club overview",
-                "banner     show club banner",
                 "members    list member handles",
                 "shortcuts  list site launchers",
                 "open NAME  open shortcut in new tab",
                 "ets        ETS countdown + progress",
-                "cycle      show active cycle",
                 "date       show current date",
                 "ls         list files",
                 "cat FILE   show file contents",
                 "clear      clear terminal",
+                "id         show user identity",
+                "pwd        print working directory",
                 "whoami     show user"
             ].join("\n");
         }
@@ -290,27 +299,32 @@
         }
 
         function showLs() {
-            printLine("README.md  members  shortcuts  ets", "muted");
+            printLine(fileList.join("  "), "muted");
         }
 
-        function showCat(target) {
-            if (target !== "README.md") {
+        async function showCat(target) {
+            if (!fileList.includes(target)) {
                 printLine(`cat: ${target}: No such file`, "warning");
                 return;
             }
-            const text = [
-                "Welcome to KATUSA Programming Club.",
-                "- Cycle: 06-25",
-                "- Commands: help, members, shortcuts, ets",
-                "- Tip: open <name> launches a site.",
-                "",
-                "Status channel: https://status.katusa.xyz",
-                "Docs: https://docs.katusa.xyz"
-            ].join("\n");
-            printBlock(`<pre>${escapeHtml(text)}</pre>`);
+            try {
+                const response = await fetch(target, { cache: "no-store" });
+                if (!response.ok) {
+                    throw new Error("not-found");
+                }
+                const text = await response.text();
+                printBlock(`<pre>${escapeHtml(text)}</pre>`);
+            } catch (error) {
+                const fallback = fileFallbacks[target];
+                if (fallback) {
+                    printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
+                    return;
+                }
+                printLine(`cat: ${target}: No such file`, "warning");
+            }
         }
 
-        function runCommand(rawInput) {
+        async function runCommand(rawInput) {
             const input = rawInput.trim();
             if (!input) {
                 return;
@@ -323,15 +337,12 @@
             const [command, ...args] = input.split(" ");
             const argString = args.join(" ");
 
-            switch (command.toLowerCase()) {
+            switch (command) {
                 case "help":
                     printBlock(`<pre>${escapeHtml(commandHelp())}</pre>`);
                     break;
                 case "about":
                     showAbout();
-                    break;
-                case "banner":
-                    printBlock(`<pre>${escapeHtml(banner.join("\n"))}</pre>`);
                     break;
                 case "members":
                     showMembers();
@@ -352,11 +363,14 @@
                 case "ets":
                     showEts();
                     break;
-                case "cycle":
-                    printLine("Cycle 06-25", "muted");
-                    break;
                 case "date":
                     printLine(new Date().toString(), "muted");
+                    break;
+                case "id":
+                    printLine("uid=1000(katusa) gid=1000(katusa) groups=1000(katusa)", "muted");
+                    break;
+                case "pwd":
+                    printLine("/home/katusa", "muted");
                     break;
                 case "whoami":
                     printLine("katusa", "muted");
@@ -365,7 +379,7 @@
                     showLs();
                     break;
                 case "cat":
-                    showCat(argString || "");
+                    await showCat(argString || "");
                     break;
                 case "clear":
                     output.innerHTML = "";
@@ -497,13 +511,13 @@
             }, totalDelay + 100);
         }
 
-        commandInput.addEventListener("keydown", (event) => {
+        commandInput.addEventListener("keydown", async (event) => {
             if (commandInput.getAttribute("contenteditable") !== "true") {
                 return;
             }
             if (event.key === "Enter") {
                 event.preventDefault();
-                runCommand(commandInput.textContent || "");
+                await runCommand(commandInput.textContent || "");
                 commandInput.textContent = "";
                 placeCaretAtEnd(commandInput);
             }
