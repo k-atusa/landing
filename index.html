@@ -226,7 +226,7 @@
             return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
         }
 
-        function isValidEntryName(value) {
+        function isValidBaseName(value) {
             return Boolean(value) && !value.includes("/") && value !== "." && value !== "..";
         }
 
@@ -471,7 +471,7 @@
             }
             targets.forEach((rawName) => {
                 const name = normalizeEntryName(rawName);
-                if (!isValidEntryName(name)) {
+                if (!isValidBaseName(name)) {
                     printLine(`touch: cannot touch '${rawName}': No such file or directory`, "warning");
                     return;
                 }
@@ -500,7 +500,7 @@
             }
             targets.forEach((rawName) => {
                 const name = normalizeEntryName(rawName);
-                if (!isValidEntryName(name)) {
+                if (!isValidBaseName(name)) {
                     printLine(`mkdir: cannot create directory '${rawName}': No such file or directory`, "warning");
                     return;
                 }
@@ -541,7 +541,7 @@
             }
             targets.forEach((rawName) => {
                 const name = normalizeEntryName(rawName);
-                if (!isValidEntryName(name)) {
+                if (!isValidBaseName(name)) {
                     if (!options.force) {
                         printLine(`rm: cannot remove '${rawName}': No such file or directory`, "warning");
                     }
@@ -579,7 +579,7 @@
                 printLine(`cp: missing destination file operand after '${srcName}'`, "warning");
                 return;
             }
-            if (!isValidEntryName(srcName) || !isValidEntryName(destName)) {
+            if (!isValidBaseName(srcName) || !isValidBaseName(destName)) {
                 printLine("cp: invalid file name", "warning");
                 return;
             }
@@ -626,7 +626,7 @@
                 printLine(`mv: missing destination file operand after '${srcName}'`, "warning");
                 return;
             }
-            if (!isValidEntryName(srcName) || !isValidEntryName(destName)) {
+            if (!isValidBaseName(srcName) || !isValidBaseName(destName)) {
                 printLine("mv: invalid file name", "warning");
                 return;
             }
@@ -656,6 +656,10 @@
             let count = 10;
             let targetIndex = 0;
             if (args[0] === "-n") {
+                if (args[1] === undefined) {
+                    printLine(`${commandName}: invalid number of lines`, "warning");
+                    return null;
+                }
                 count = Number.parseInt(args[1], 10);
                 targetIndex = 2;
             } else if (args[0]?.startsWith("-n")) {
