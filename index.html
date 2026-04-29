@@ -178,7 +178,7 @@
         const files = {
             "CNAME": { fallback: "katusa.space" },
             "README.md": { fallback: "# landing\npowers katusa.xyz mainpage" },
-            "index.html": {}
+            "index.html": { fallback: () => `<!DOCTYPE html>\n${document.documentElement.outerHTML}` }
         };
         const fileList = Object.keys(files);
 
@@ -307,7 +307,7 @@
                 printLine(`cat: ${target}: No such file`, "warning");
                 return;
             }
-            const fallback = fileEntry.fallback;
+            const fallbackValue = fileEntry.fallback;
             let fetchedText;
             try {
                 const response = await fetch(target);
@@ -315,13 +315,15 @@
                     fetchedText = await response.text();
                 }
             } catch (error) {
+                console.warn("cat: fetch failed", error);
                 fetchedText = null;
             }
             if (typeof fetchedText === "string") {
                 printBlock(`<pre>${escapeHtml(fetchedText)}</pre>`);
                 return;
             }
-            if (fallback) {
+            const fallback = typeof fallbackValue === "function" ? fallbackValue() : fallbackValue;
+            if (typeof fallback === "string") {
                 printBlock(`<pre>${escapeHtml(fallback)}</pre>`);
                 return;
             }
