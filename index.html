@@ -441,6 +441,8 @@
                 "cp SRC DEST copy file",
                 "mv SRC DEST move or rename",
                 "rm [-r] NAME remove entry",
+                "CMD > FILE write output to file",
+                "CMD >> FILE append output to file",
                 "history    show command history",
                 "clear      clear terminal",
                 "id         show user identity",
@@ -555,6 +557,32 @@
             const loads = getLoadAverages();
             const time = now.toTimeString().split(" ")[0];
             printLine(`${time} up ${uptimeText}, 1 user, load average: ${loads.join(", ")}`, "muted");
+        };
+
+        const writeToFile = (name, text, append) => {
+            const normalized = normalizeEntryName(name);
+            if (!isValidBaseName(normalized)) {
+                printLine(`bash: ${name}: No such file or directory`, "warning");
+                return;
+            }
+            if (isSystemEntry(normalized)) {
+                printLine(`bash: ${normalized}: Permission denied`, "warning");
+                return;
+            }
+            const existing = virtualEntries.get(normalized);
+            if (existing && existing.type === "dir") {
+                printLine(`bash: ${normalized}: Is a directory`, "warning");
+                return;
+            }
+            const now = new Date();
+            const prevContent = append && existing ? (existing.content ?? "") : "";
+            const newContent = prevContent ? prevContent + "\n" + text : text;
+            if (existing) {
+                existing.content = newContent;
+                existing.updatedAt = now;
+            } else {
+                virtualEntries.set(normalized, { type: "file", content: newContent, createdAt: now, updatedAt: now });
+            }
         };
 
         const touchFiles = (targets) => {
@@ -802,6 +830,19 @@
             await showLines(args, "tail", true);
         };
 
+        const parseRedirection = (input) => {
+            // Match >>  or  > redirection at the end of the command
+            const appendMatch = input.match(/^(.*?)>>([\s\S]*)$/);
+            if (appendMatch) {
+                return { commandPart: appendMatch[1].trim(), targetFile: appendMatch[2].trim(), append: true };
+            }
+            const overwriteMatch = input.match(/^(.*?)>([\s\S]*)$/);
+            if (overwriteMatch) {
+                return { commandPart: overwriteMatch[1].trim(), targetFile: overwriteMatch[2].trim(), append: false };
+            }
+            return null;
+        };
+
         const runCommand = async (rawInput) => {
             const input = rawInput.trim();
             if (!input) {
@@ -811,6 +852,44 @@
             history.push(input);
             historyIndex = history.length;
             printLine(`<span class="prompt">katusa@humphreys:~$</span> ${escapeHtml(input)}`, "", true);
+
+            // Handle output redirection (> and >>)
+            const redirection = parseRedirection(input);
+            if (redirection !== null) {
+                const { commandPart, targetFile, append } = redirection;
+                if (!targetFile) {
+                    printLine("bash: syntax error near unexpected token `newline'", "warning");
+                    return;
+                }
+                const [redirCmd, ...redirArgs] = commandPart.split(" ");
+                const redirArgString = redirArgs.join(" ");
+                let capturedText = null;
+                if (redirCmd === "echo") {
+                    capturedText = redirArgString;
+                } else if (redirCmd === "cat" && redirArgs.length > 0) {
+                    const result = await getFileContent(redirArgs[0]);
+                    if (result.error === "missing") {
+                        printLine(`cat: ${normalizeEntryName(redirArgs[0])}: No such file`, "warning");
+                        return;
+                    }
+                    if (result.error === "isDir") {
+                        printLine(`cat: ${normalizeEntryName(redirArgs[0])}: Is a directory`, "warning");
+                        return;
+                    }
+                    if (result.error) {
+                        printLine(`cat: ${normalizeEntryName(redirArgs[0])}: Failed to read file`, "warning");
+                        return;
+                    }
+                    capturedText = result.content;
+                } else if (!redirCmd) {
+                    capturedText = "";
+                } else {
+                    printLine(`bash: ${redirCmd}: cannot redirect this command`, "warning");
+                    return;
+                }
+                writeToFile(targetFile, capturedText, append);
+                return;
+            }
 
             const [command, ...args] = input.split(" ");
             const argString = args.join(" ");
