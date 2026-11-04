@@ -1,2 +1,2 @@
 # landing
-powers katusa.xyz mainpage
+powers katusa.space mainpage
